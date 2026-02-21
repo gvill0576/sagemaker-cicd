@@ -1,0 +1,40 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: sagemaker-fastapi
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: sagemaker-fastapi
+  template:
+    metadata:
+      labels:
+        app: sagemaker-fastapi
+    spec:
+      imagePullSecrets:
+        - name: registry-secrets
+      containers:
+        - name: sagemaker-fastapi
+          image: ghcr.io/gvill0576/sagemaker-fastapi:latest
+          ports:
+            - containerPort: 80
+          resources:
+            requests:
+              cpu: "50m"
+              memory: "50Mi"
+            limits:
+              cpu: "100m"
+              memory: "100Mi"
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 80
+            initialDelaySeconds: 10
+            periodSeconds: 10
+          readinessProbe:
+            httpGet:
+              path: /ready
+              port: 80
+            initialDelaySeconds: 5
+            periodSeconds: 5
